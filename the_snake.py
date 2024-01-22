@@ -17,6 +17,17 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
+# Направления движения после нажатия клавиши:
+CONTROL = {(pygame.K_UP, LEFT): UP,
+           (pygame.K_UP, RIGHT): UP,
+           (pygame.K_DOWN, LEFT): DOWN,
+           (pygame.K_DOWN, RIGHT): DOWN,
+           (pygame.K_LEFT, UP): LEFT,
+           (pygame.K_LEFT, DOWN): LEFT,
+           (pygame.K_RIGHT, UP): RIGHT,
+           (pygame.K_RIGHT, DOWN): RIGHT
+           }
+
 # Цвет фона - черный:
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
 
@@ -84,11 +95,8 @@ class Apple(GameObject):
             (self.position[0], self.position[1]),
             (GRID_SIZE, GRID_SIZE)
         )
-
         self.pydraw(self.body_color, rect, 0)
         self.pydraw(BORDER_COLOR, rect, 1)
-        # pygame.draw.rect(screen, self.body_color, rect)
-        # pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
 class Snake(GameObject):
@@ -123,31 +131,10 @@ class Snake(GameObject):
                              + self.direction[1]
                              * GRID_SIZE)
                              % SCREEN_HEIGHT)
-
-        # new_coordinate_dx = (self.head_snake[0]
-        #                      + self.direction[0]
-        #                      * GRID_SIZE)
-        # new_coordinate_dy = (self.head_snake[1]
-        #                      + self.direction[1]
-        #                      * GRID_SIZE)
-
         self.new_head_snake = (new_coordinate_dx, new_coordinate_dy)
-
-        # if self.new_head_snake[0] < 0 and self.direction == LEFT:
-        #     self.new_head_snake = (SCREEN_WIDTH, self.new_head_snake[1])
-        # elif (self.new_head_snake[0] == SCREEN_WIDTH
-        #         and self.direction == RIGHT):
-        #     self.new_head_snake = (0, self.new_head_snake[1])
-        # elif self.head_snake[1] < 0 and self.direction == UP:
-        #     self.new_head_snake = (self.new_head_snake[0], SCREEN_HEIGHT)
-        # elif (self.new_head_snake[1] == SCREEN_HEIGHT
-        #         and self.direction == DOWN):
-        #     self.new_head_snake = (self.new_head_snake[0], 0)
-
         if self.new_head_snake == necessary_class.position:
             self.length += 1
             necessary_class.randomize_position()
-
         if self.new_head_snake in self.positions[2::]:
             self.reset()
         else:
@@ -172,15 +159,11 @@ class Snake(GameObject):
             )
             self.pydraw(self.body_color, rect, 0)
             self.pydraw(BORDER_COLOR, rect, 1)
-            # pygame.draw.rect(screen, self.body_color, rect)
-            # pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
         # Отрисовка головы змейки
         head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
         self.pydraw(self.body_color, head_rect, 0)
         self.pydraw(BORDER_COLOR, head_rect, 1)
-        # pygame.draw.rect(screen, self.body_color, head_rect)
-        # pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
 
         # Затирание последнего сегмента
         if self.last:
@@ -195,23 +178,13 @@ def handle_keys(game_object):
     """Функция, обрабатывающая нажатия клавиш,
     для изменения направления движения змейки.
     """
-    dict_control = {(pygame.K_UP, LEFT): UP,
-                    (pygame.K_UP, RIGHT): UP,
-                    (pygame.K_DOWN, LEFT): DOWN,
-                    (pygame.K_DOWN, RIGHT): DOWN,
-                    (pygame.K_LEFT, UP): LEFT,
-                    (pygame.K_LEFT, DOWN): LEFT,
-                    (pygame.K_RIGHT, UP): RIGHT,
-                    (pygame.K_RIGHT, DOWN): RIGHT
-                    }
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             raise SystemExit
         elif event.type == pygame.KEYDOWN:
-            if (event.key, game_object.direction) in dict_control:
-                game_object.next_direction = dict_control[(
+            if (event.key, game_object.direction) in CONTROL:
+                game_object.next_direction = CONTROL[(
                     event.key, game_object.direction)]
             elif event.key == pygame.K_ESCAPE:
                 pause()
